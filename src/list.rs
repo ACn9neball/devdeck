@@ -9,6 +9,7 @@ struct Projects {
     b_description: String,
     d_description: String,
     progress: String,
+    purpose: String,
 }
 
 pub fn display() -> Result<(), Box<dyn Error>> {
@@ -23,6 +24,7 @@ pub fn display() -> Result<(), Box<dyn Error>> {
             b_description: row.get(2)?,
             d_description: row.get(3)?,
             progress: row.get(4)?,
+            purpose: row.get(7)?,
         })
     })?;
     let mut data = Vec::new();
@@ -37,6 +39,7 @@ pub fn display() -> Result<(), Box<dyn Error>> {
             wrapped_b_desc.cell(),
             wrapped_d_desc.cell(),
             p.progress.cell(),
+            p.purpose.cell(),
         ]);
     }
 
@@ -48,6 +51,7 @@ pub fn display() -> Result<(), Box<dyn Error>> {
             "BASIC DESCRIPTION".cell().bold(true),
             "DETAILED DESCRIPTION".cell().bold(true),
             "PROGRESS".cell().bold(true),
+            "MADE FOR".cell().bold(true),
         ])
         .bold(true);
 
