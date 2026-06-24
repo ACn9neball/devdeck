@@ -107,11 +107,11 @@ pub fn create(id: i64) -> Result<()> {
         detailed_description,
         language_list,
         feature_list,
-        repository,
+        repository.clone(),
         purpose,
     );
 
-    if !directory.is_empty() {
+    if !directory.is_empty() && !repository.is_empty() {
         let mut path = PathBuf::from(directory);
         if path.exists() {
             path.push("README.md");
