@@ -6,6 +6,7 @@ mod readme;
 mod search;
 
 use clap::{Parser, Subcommand};
+use std::fs;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about= None)]
@@ -28,9 +29,16 @@ enum Commands {
     Search { name: String },
 }
 
-fn main() {
-    let path = "markdown.db";
-    database::db_setup(path).expect("!Create");
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let name = "devdeck";
+    let mut path = dirs::config_dir().ok_or("No system config file")?;
+    path.push(name);
+    fs::create_dir_all(&path)?;
+
+    let data = "markdown.db";
+    path.push(data);
+    let database_path: &str = path.to_str().unwrap();
+    database::db_setup(database_path).expect("!Create");
     let args = Args::parse();
     match &args.command {
         Commands::Add => input::start(0, 0).expect(""),
@@ -39,4 +47,5 @@ fn main() {
         Commands::Edit { id } => input::start(1, id.clone()).expect(""),
         Commands::Search { name } => search::display(name.clone()).expect(""),
     }
+    Ok(())
 }

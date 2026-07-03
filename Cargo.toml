@@ -11,3 +11,4 @@ rusqlite = { version = "0.39.0", features = ["bundled"] }
 clap = { version = "4.6.1", features = ["derive"] }
 cli-table = "0.5.0"
 textwrap = "0.16"
+dirs = "6.0.0"

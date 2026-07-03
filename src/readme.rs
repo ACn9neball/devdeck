@@ -1,5 +1,6 @@
 use std::{
-    fs::{remove_file, write},
+    error::Error,
+    fs::{self, remove_file, write},
     path::PathBuf,
 };
 
@@ -31,7 +32,7 @@ struct Languages {
     unique_id: i64,
 }
 
-pub fn create(id: i64) -> Result<()> {
+pub fn create(id: i64) -> Result<(), Box<dyn Error>> {
     let mut title = String::new();
     let mut basic_description = String::new();
     let mut detailed_description = String::new();
@@ -41,8 +42,15 @@ pub fn create(id: i64) -> Result<()> {
     let mut language_list: Vec<String> = vec![];
     let mut feature_list: Vec<String> = vec![];
 
-    const DB: &str = "markdown.db";
-    let c = Connection::open(DB)?;
+    let name = "devdeck";
+    let mut path = dirs::config_dir().ok_or("No system config file")?;
+    path.push(name);
+    fs::create_dir_all(&path)?;
+
+    let data = "markdown.db";
+    path.push(data);
+    let db: &str = path.to_str().unwrap();
+    let c = Connection::open(db)?;
     let mut projects = c.prepare("SELECT * FROM projects WHERE id = ?1")?;
     let mut languages = c.prepare("SELECT * FROM languages")?;
     let mut features = c.prepare("SELECT * FROM features")?;

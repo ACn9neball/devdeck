@@ -1,5 +1,4 @@
-const DB: &str = "markdown.db";
-
+use crate::readme::{create, split};
 use ratatui::{
     DefaultTerminal, Frame,
     crossterm::event::{self, Event, KeyCode, KeyModifiers},
@@ -9,8 +8,7 @@ use ratatui::{
 };
 use ratatui_textarea::TextArea;
 use rusqlite::Connection;
-
-use crate::readme::{create, split};
+use std::fs;
 
 #[derive(Debug)]
 struct Projects {
@@ -64,7 +62,15 @@ fn run(terminal: &mut DefaultTerminal, function: i64, id: i64) -> color_eyre::Re
     let mut edt_purpose = TextArea::default();
 
     if function == 1 {
-        let c = Connection::open(DB)?;
+        let name = "devdeck";
+        let mut path = dirs::config_dir().ok_or("No system config file").unwrap();
+        path.push(name);
+        fs::create_dir_all(&path).unwrap();
+
+        let data = "markdown.db";
+        path.push(data);
+        let db: &str = path.to_str().unwrap();
+        let c = Connection::open(db)?;
         let mut projects = c.prepare("SELECT * FROM projects WHERE id = ?1")?;
         let mut languages = c.prepare("SELECT * FROM languages")?;
         let mut features = c.prepare("SELECT * FROM features")?;
@@ -203,7 +209,15 @@ fn run(terminal: &mut DefaultTerminal, function: i64, id: i64) -> color_eyre::Re
                         }
 
                         if complete == true {
-                            let c = Connection::open(DB)?;
+                            let name = "devdeck";
+                            let mut p = dirs::config_dir().ok_or("No system config file").unwrap();
+                            p.push(name);
+                            fs::create_dir_all(&p).unwrap();
+
+                            let data = "markdown.db";
+                            p.push(data);
+                            let db: &str = p.to_str().unwrap();
+                            let c = Connection::open(db)?;
                             let project = Projects {
                                 id: 0,
                                 title: title,
@@ -256,7 +270,16 @@ fn run(terminal: &mut DefaultTerminal, function: i64, id: i64) -> color_eyre::Re
                                 )?;
                             }
                             if function == 1 {
-                                let c = Connection::open(DB)?;
+                                let name = "devdeck";
+                                let mut p =
+                                    dirs::config_dir().ok_or("No system config file").unwrap();
+                                p.push(name);
+                                fs::create_dir_all(&p).unwrap();
+
+                                let data = "markdown.db";
+                                p.push(data);
+                                let db: &str = p.to_str().unwrap();
+                                let c = Connection::open(db)?;
                                 let mut languages = c.prepare("SELECT * FROM languages")?;
                                 let language_iter = languages.query_map([], |row| {
                                     Ok(Languages {

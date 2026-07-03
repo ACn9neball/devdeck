@@ -1,4 +1,4 @@
-use std::cmp::max;
+use std::{cmp::max, error::Error, fs};
 
 use rusqlite::{Connection, Result};
 
@@ -28,9 +28,16 @@ struct Languages {
     unique_id: i64,
 }
 
-pub fn view(id: i64) -> Result<()> {
-    const DB: &str = "markdown.db";
-    let c = Connection::open(DB)?;
+pub fn view(id: i64) -> Result<(), Box<dyn Error>> {
+    let name = "devdeck";
+    let mut path = dirs::config_dir().ok_or("No system config file")?;
+    path.push(name);
+    fs::create_dir_all(&path)?;
+
+    let data = "markdown.db";
+    path.push(data);
+    let db: &str = path.to_str().unwrap();
+    let c = Connection::open(db)?;
     let mut projects = c.prepare("SELECT * FROM projects")?;
     let mut languages = c.prepare("SELECT * FROM languages")?;
     let mut features = c.prepare("SELECT * FROM features")?;

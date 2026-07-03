@@ -1,6 +1,6 @@
 use cli_table::{Cell, Style, Table, format::Justify, print_stdout};
 use rusqlite::Connection;
-use std::error::Error;
+use std::{error::Error, fs};
 
 #[derive(Debug)]
 struct Projects {
@@ -12,8 +12,15 @@ struct Projects {
 }
 
 pub fn display(name: String) -> Result<(), Box<dyn Error>> {
-    const DB: &str = "markdown.db";
-    let c = Connection::open(DB)?;
+    let n = "devdeck";
+    let mut path = dirs::config_dir().ok_or("No system config file")?;
+    path.push(n);
+    fs::create_dir_all(&path)?;
+
+    let data = "markdown.db";
+    path.push(data);
+    let db: &str = path.to_str().unwrap();
+    let c = Connection::open(db)?;
 
     let mut all = c.prepare("SELECT * FROM projects WHERE title LIKE ?1")?;
     let sp = format!("%{}%", name);
